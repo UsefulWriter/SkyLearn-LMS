@@ -14,7 +14,8 @@ from django.urls import reverse
 from django.utils.timezone import now
 from django.utils.translation import gettext_lazy as _
 from django.dispatch import receiver
-from model_utils.managers import InheritanceManager
+# from model_utils.managers import InheritanceManager
+from django.db import models as django_models
 
 from course.models import Course
 from core.utils import unique_slug_generator
@@ -114,7 +115,7 @@ class Quiz(models.Model):
         super().save(*args, **kwargs)
 
     def get_questions(self):
-        return self.question_set.all().select_subclasses()
+        return self.question_set.all()  # Removed select_subclasses() for compatibility
 
     @property
     def get_max_score(self):
@@ -188,9 +189,9 @@ class Progress(models.Model):
 class SittingManager(models.Manager):
     def new_sitting(self, user, quiz, course):
         if quiz.random_order:
-            question_set = quiz.question_set.all().select_subclasses().order_by("?")
+            question_set = quiz.question_set.all().order_by("?")  # Removed select_subclasses()
         else:
-            question_set = quiz.question_set.all().select_subclasses()
+            question_set = quiz.question_set.all()  # Removed select_subclasses()
 
         question_ids = [item.id for item in question_set]
         if not question_ids:
@@ -346,7 +347,7 @@ class Sitting(models.Model):
     def get_questions(self, with_answers=False):
         question_ids = self._question_ids()
         questions = sorted(
-            self.quiz.question_set.filter(id__in=question_ids).select_subclasses(),
+            self.quiz.question_set.filter(id__in=question_ids),  # Removed select_subclasses()
             key=lambda q: question_ids.index(q.id),
         )
         if with_answers:
@@ -389,7 +390,9 @@ class Question(models.Model):
         verbose_name=_("Explanation"),
     )
 
-    objects = InheritanceManager()
+    # Temporarily using default manager due to compatibility issues
+    # objects = InheritanceManager()
+    objects = django_models.Manager()
 
     class Meta:
         verbose_name = _("Question")

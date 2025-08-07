@@ -269,3 +269,6 @@ SEMESTER_CHOICES = (
     (SECOND, _("Second")),
     (THIRD, _("Third")),
 )
+
+# Allow django-jet popups to work
+X_FRAME_OPTIONS = 'SAMEORIGIN'

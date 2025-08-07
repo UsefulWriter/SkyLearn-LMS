@@ -22,7 +22,7 @@ class ChoiceInline(admin.TabularInline):
 
 class QuizAdminForm(TranslationModelForm):
     questions = forms.ModelMultipleChoiceField(
-        queryset=Question.objects.all().select_subclasses(),
+        queryset=Question.objects.all(),  # Removed select_subclasses() for compatibility
         required=False,
         label=_("Questions"),
         widget=FilteredSelectMultiple(verbose_name=_("Questions"), is_stacked=False),
@@ -36,7 +36,7 @@ class QuizAdminForm(TranslationModelForm):
         super(QuizAdminForm, self).__init__(*args, **kwargs)
         if self.instance.pk:
             self.fields["questions"].initial = (
-                self.instance.question_set.all().select_subclasses()
+                self.instance.question_set.all()  # Removed select_subclasses() for compatibility
             )
 
     def save(self, commit=True):
