@@ -8,30 +8,45 @@
 <style>
 /* Full screen layout adjustments */
 body {
-    overflow-x: hidden;
+    overflow: hidden;
+    margin: 0;
+    padding: 0;
+    height: 100vh;
 }
 
 .container-fluid.main-content {
     max-width: 100% !important;
     padding: 0 !important;
+    height: 100vh;
+    overflow: hidden;
 }
 
 .scorm-module-container {
     background: #fff;
-    border-radius: 8px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    border-radius: 0;
+    box-shadow: none;
     overflow: hidden;
     margin: 0;
     height: 100vh;
+    width: 100vw;
     display: flex;
     flex-direction: column;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1000;
 }
 
 .scorm-module-header {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white;
-    padding: 15px 20px;
+    padding: 12px 20px;
     flex-shrink: 0;
+    height: 80px;
+    min-height: 80px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 }
 
 .scorm-module-info {
@@ -72,37 +87,52 @@ body {
 .scorm-main-content {
     flex: 1;
     display: flex;
-    background: #2a3f5f;
-    min-height: 0;
+    background: #f8f9fa;
+    min-height: calc(100vh - 80px);
+    height: calc(100vh - 80px);
+    flex-direction: row;
+    align-items: stretch;
+    width: 100vw;
+    overflow: hidden;
 }
 
 .scorm-content-wrapper {
     position: relative;
-    background: #2a3f5f;
+    background: #f8f9fa;
     flex: 1;
     display: flex;
     align-items: stretch;
-    justify-content: center;
+    justify-content: stretch;
     padding: 0;
-    width: 90%;
+    order: 1;
+    width: calc(100vw - 280px);
+    height: calc(100vh - 80px);
+    min-width: 0;
+    overflow: hidden;
 }
 
 .scorm-iframe {
-    width: 100%;
-    height: 100%;
+    width: 100% !important;
+    height: 100% !important;
+    min-width: calc(100vw - 300px) !important;
+    min-height: calc(100vh - 100px) !important;
     border: none;
     display: block;
-    background: #2a3f5f;
+    background: white;
+    flex: 1;
 }
 
 .scorm-sidebar {
     background: white;
     padding: 15px;
     border-left: 1px solid #e5e7eb;
-    width: 10%;
-    min-width: 200px;
+    width: 280px !important;
+    min-width: 280px !important;
+    max-width: 280px !important;
     overflow-y: auto;
     flex-shrink: 0;
+    order: 2;
+    height: calc(100vh - 80px);
 }
 
 .scorm-sidebar h6 {
@@ -163,12 +193,12 @@ body {
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(42, 63, 95, 0.95);
+    background: rgba(255, 255, 255, 0.95);
     display: flex;
     justify-content: center;
     align-items: center;
-    z-index: 10;
-    color: white;
+    z-index: 20;
+    color: #333;
 }
 
 .loading-content {
@@ -188,7 +218,40 @@ body {
     to { transform: rotate(360deg); }
 }
 
+/* Force iframe to maximum size */
+.scorm-content-wrapper iframe {
+    width: 100% !important;
+    height: 100% !important;
+    min-width: calc(100vw - 300px) !important;
+    min-height: calc(100vh - 100px) !important;
+    max-width: calc(100vw - 300px) !important;
+    max-height: calc(100vh - 100px) !important;
+    border: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    display: block !important;
+    flex: 1 !important;
+}
+
+/* Debug borders - remove after testing */
+/*.scorm-content-wrapper {
+    border: 3px solid red !important;
+}
+.scorm-iframe {
+    border: 3px solid blue !important;
+}
+.scorm-main-content {
+    border: 3px solid green !important;
+}*/
+
 /* Responsive adjustments */
+@media (max-width: 1200px) {
+    .scorm-sidebar {
+        width: 240px;
+        min-width: 200px;
+    }
+}
+
 @media (max-width: 991px) {
     .scorm-main-content {
         flex-direction: column;
@@ -196,20 +259,40 @@ body {
     
     .scorm-content-wrapper {
         width: 100%;
-        height: 70vh;
+        height: 65vh;
+        order: 1;
     }
     
     .scorm-sidebar {
         width: 100%;
-        height: 30vh;
+        height: 35vh;
+        min-width: auto;
         border-left: none;
         border-top: 1px solid #e5e7eb;
+        order: 2;
+        padding: 10px 15px;
+    }
+    
+    .scorm-sidebar h6 {
+        font-size: 10px;
+        margin-bottom: 8px;
+    }
+    
+    .scorm-status-card {
+        padding: 8px;
+        margin-bottom: 8px;
+    }
+    
+    .scorm-action-buttons {
+        flex-direction: row;
+        gap: 5px;
     }
 }
 
 @media (max-width: 767px) {
     .scorm-module-container {
         border-radius: 0;
+        margin: 0;
     }
     
     .scorm-content-wrapper {
@@ -218,6 +301,37 @@ body {
     
     .scorm-sidebar {
         height: 40vh;
+        padding: 8px 12px;
+    }
+    
+    .scorm-module-header {
+        padding: 10px 15px;
+    }
+    
+    .scorm-module-title {
+        font-size: 18px;
+    }
+    
+    .scorm-action-buttons .btn {
+        font-size: 11px;
+        padding: 4px 8px;
+    }
+}
+
+@media (max-width: 480px) {
+    .scorm-content-wrapper {
+        height: 55vh;
+    }
+    
+    .scorm-sidebar {
+        height: 45vh;
+        padding: 6px 10px;
+    }
+    
+    .scorm-module-meta {
+        flex-direction: column;
+        gap: 5px;
+        font-size: 12px;
     }
 }
 </style>
@@ -226,29 +340,27 @@ body {
 {% block content %}
 <div class="container-fluid main-content">
 
-<!-- Breadcrumb Navigation -->
-<nav style="--bs-breadcrumb-divider: '>';position: absolute; top: 10px; left: 20px; z-index: 1000;" aria-label="breadcrumb">
-    <ol class="breadcrumb bg-transparent">
-        <li class="breadcrumb-item"><a href="/" class="text-white">{% trans 'Home' %}</a></li>
-        <li class="breadcrumb-item"><a href="{% url 'programs' %}" class="text-white">{% trans 'Programs' %}</a></li>
-        <li class="breadcrumb-item"><a href="{% url 'program_detail' package.course.program.id %}" class="text-white">{{ package.course.program }}</a></li>
-        <li class="breadcrumb-item"><a href="{% url 'course_detail' package.course.slug %}" class="text-white">{{ package.course }}</a></li>
-        <li class="breadcrumb-item active text-white-50" aria-current="page">{{ package.title }}</li>
-    </ol>
-</nav>
+<!-- Breadcrumb Navigation - Embedded in Header -->
+<!-- Navigation will be in the header section -->
 
 <!-- SCORM Module Container -->
 <div class="scorm-module-container">
     <!-- Module Header -->
     <div class="scorm-module-header">
         <div class="scorm-module-info">
-            <div>
-                <h1 class="scorm-module-title">{{ package.title }}</h1>
-                <p class="mb-0 mt-1 small">{{ package.description|default:"Interactive SCORM Learning Module" }}</p>
-            </div>
-            <div class="scorm-module-meta">
-                <span><i class="fas fa-book-open me-1"></i> {{ package.course.title }}</span>
-                <span><i class="fas fa-clock me-1"></i> <span id="timeSpent">00:00</span></span>
+            <div class="d-flex justify-content-between align-items-center w-100">
+                <div>
+                    <div class="d-flex align-items-center mb-1">
+                        <a href="{% url 'course_detail' package.course.slug %}" class="text-white me-2" title="{% trans 'Back to Course' %}">
+                            <i class="fas fa-arrow-left"></i>
+                        </a>
+                        <h1 class="scorm-module-title mb-0">{{ package.title }}</h1>
+                    </div>
+                    <p class="mb-0 small opacity-75">{{ package.course.title }}</p>
+                </div>
+                <div class="scorm-module-meta">
+                    <span><i class="fas fa-clock me-1"></i> <span id="timeSpent">00:00</span></span>
+                </div>
             </div>
         </div>
         
@@ -531,9 +643,44 @@ function onScormLoad() {
     }
 }
 
+// Force iframe sizing
+function forceIframeSize() {
+    const iframe = document.getElementById('scormFrame');
+    const wrapper = document.querySelector('.scorm-content-wrapper');
+    
+    if (iframe && wrapper) {
+        const availableWidth = window.innerWidth - 280; // Minus sidebar
+        const availableHeight = window.innerHeight - 80; // Minus header
+        
+        iframe.style.width = availableWidth + 'px';
+        iframe.style.height = availableHeight + 'px';
+        iframe.style.minWidth = availableWidth + 'px';
+        iframe.style.minHeight = availableHeight + 'px';
+        
+        wrapper.style.width = availableWidth + 'px';
+        wrapper.style.height = availableHeight + 'px';
+        
+        console.log('Iframe resized to:', availableWidth + 'x' + availableHeight);
+    }
+}
+
 // Initialize everything when page loads
 document.addEventListener('DOMContentLoaded', function() {
     initializeSCORM();
+    
+    // Force iframe size immediately
+    setTimeout(forceIframeSize, 100);
+    
+    // Force resize again after iframe loads
+    const iframe = document.getElementById('scormFrame');
+    if (iframe) {
+        iframe.addEventListener('load', function() {
+            setTimeout(forceIframeSize, 200);
+        });
+    }
+    
+    // Handle window resize
+    window.addEventListener('resize', forceIframeSize);
     
     // Start time tracking
     timeInterval = setInterval(updateTimeSpent, 1000);
