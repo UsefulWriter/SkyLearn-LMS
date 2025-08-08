@@ -1,0 +1,215 @@
+# SkyLearn LMS - Complete Feature List (Unprioritized)
+
+## Accounts App Features
+- Multi-role user system (Student, Lecturer, Parent, Department Head)
+- User registration with public student registration form
+- User authentication (login, logout, password reset)
+- Profile management with picture upload
+- Password change functionality
+- Username validation with AJAX availability check
+- Profile pictures with auto-resize to 300x300px
+- Staff management (add, edit, delete lecturers)
+- Student management with advanced filtering
+- Parent management with student linking
+- User filtering by ID, name, email, program
+- Program assignment for students
+- PDF report generation for lecturer and student lists
+- Centralized admin panel dashboard
+- Role-based decorators (@admin_required, @lecturer_required, @student_required)
+- Automatic credential generation for new users
+- Email notifications for new account credentials
+- User search by multiple criteria
+- Gender statistics tracking
+
+## Course App Features
+- Course catalog browsing by program
+- Course details viewing (information, files, videos, lecturers)
+- Course registration by semester
+- Course drop functionality
+- Personal course list for students and lecturers
+- File downloads (PDF, Word, Excel, PowerPoint, archives)
+- Video streaming for course tutorials
+- Program management (CRUD operations)
+- Course management within programs
+- Course allocation to lecturers
+- File upload with validation
+- Video upload with validation
+- Course content organization
+- Program oversight with full CRUD
+- Course allocation management
+- Content approval and management
+- Credit tracking and program requirements
+- Multilingual support for program/course titles (EN/FR/ES/RU)
+- File type restriction and auto-detection
+- SEO-friendly URL slug generation
+- Activity logging for all operations
+- Semester-based course offerings
+- Automatic credit calculation by semester
+
+## Quiz App Features
+- Interactive quiz interface with progress tracking
+- Multiple choice questions
+- Essay questions
+- Timed assessments with timestamps
+- Progress saving and quiz resumption
+- Instant feedback with correct answers (configurable)
+- Detailed results display with scoring
+- Assessment history viewing
+- Quiz creation with configuration options
+- Question bank management
+- Quiz randomization settings
+- Single attempt enforcement
+- Pass mark configuration
+- Bulk question creation
+- Manual quiz marking and scoring
+- Grade adjustment with feedback
+- Assessment analytics and statistics
+- Quiz oversight for administrators
+- Global quiz settings configuration
+- Draft mode for hidden quizzes
+- Automatic grading for MC questions
+- Manual grading interface for essays
+- Pass/fail marking with feedback
+- Answer review settings
+
+## Result App Features
+- Individual course grade viewing
+- GPA calculation for current semester
+- CGPA tracking across all semesters
+- Assessment breakdown viewing
+- Complete academic history by semester
+- Registration form PDF generation
+- Score entry for lecturers
+- Batch grading for multiple students
+- Grade component tracking (assignments, midterms, quizzes, attendance, finals)
+- Result sheet PDF generation
+- Individual student performance viewing
+- Grade oversight for administrators
+- Academic standards monitoring
+- System-wide performance report generation
+- Automatic letter grade calculation
+- Weighted GPA/CGPA computation
+- Grade boundary system (A+, A, A-, B+, B, B-, C+, C, C-, D, F)
+- 4.0 scale grade point system
+- Professional result sheet generation
+- Automatic pass/fail determination
+
+## Core App Features
+- News and events viewing
+- Personalized role-based dashboard
+- Central information hub homepage
+- Content management for news and events
+- Academic session management
+- Semester management and control
+- Activity monitoring with logs
+- Statistics dashboard with user counts
+- Current session/semester enforcement
+- Multilingual news content
+- Automatic activity logging
+- Real-time dashboard analytics
+
+## Payments App Features
+- Stripe payment gateway integration
+- PayPal payment gateway integration
+- Coinbase payment gateway integration
+- Paylike payment gateway integration
+- GoPay payment gateway integration
+- Invoice generation
+- Secure payment processing
+- Payment history viewing
+- Invoice status tracking
+- Unique transaction identifiers
+- Payment completion monitoring
+
+## Search App Features
+- Universal search across all content types
+- Multi-model search results
+- News search
+- Program search
+- Course search
+- Quiz search
+- Paginated search results
+- Search result statistics
+- Cross-model search interface
+- Result ranking by relevance
+- Search analytics tracking
+
+## System-Wide Features
+- Multi-language support (English, French, Spanish, Russian)
+- Content translation for all user-facing elements
+- Django i18n internationalization framework
+- Role-based access control
+- Secure session management
+- CSRF protection
+- Django password validation
+- File upload validation
+- Organized media management
+- Automatic image resizing
+- File type auto-detection
+- Academic report PDF generation
+- Official document generation
+- Branded PDF templates
+- HTML email templates
+- Complete audit trail logging
+- User action tracking
+- System usage monitoring
+- Bootstrap-based responsive design
+- Cross-browser compatibility
+- WCAG-compliant accessibility
+- Database query optimization
+- Comprehensive data validation
+- Foreign key constraints with cascading deletes
+- Clean data export capabilities
+- WhiteNoise static file handling (production)
+- Gunicorn WSGI server support (production)
+- Django Storages with boto3 (production)
+- Django Anymail with Amazon SES (production)
+- SCSS to CSS compilation
+- FontAwesome 6.5.1 icons
+- Bootstrap 5.3.2 framework
+- Rubik font integration
+- Activity signal-based logging
+- Email backend configuration (console/SMTP)
+- Environment variable configuration
+- Debug mode toggle
+- Secret key management
+- Fixture data support
+- Factory Boy test data generation
+- Unit test framework
+- Test decorators for role-based testing
+- Django admin interface customization
+- Custom user model with AbstractUser
+- User hierarchy system
+- Academic structure relationships
+- Grade calculation algorithms
+- Session and semester period management
+- Course prerequisite system
+- File extension validation
+- Video file validation
+- Registration form generation
+- Course material categorization
+- Quiz question inheritance model
+- Progress tracking system
+- Sitting session management
+- Choice randomization
+- Essay question review workflow
+- Multi-gateway payment selection
+- Invoice code generation
+- Search result pagination
+- Template inheritance structure
+- Base template system
+- Error handler templates (400, 403, 404, 500)
+- Email confirmation templates
+- Privacy policy page
+- Terms of service page
+- Sidebar navigation
+- Navbar with role-based menu items
+- Filter form components
+- Message display system
+- Upload form interfaces
+- Video player integration
+- PDF viewer compatibility
+- Download tracking
+- Academic calendar placeholder
+- Data export placeholder
+- xhtml2pdf report generation placeholder

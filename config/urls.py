@@ -24,6 +24,7 @@ urlpatterns += i18n_patterns(
     path("search/", include("search.urls")),
     path("quiz/", include("quiz.urls")),
     path("payments/", include("payments.urls")),
+    path("scorm/", include("scorm.urls")),
 )
 
 

@@ -1,0 +1,89 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load i18n %}
+
+{% block title %}{% trans "Delete SCORM Package" %} - {{ object.title }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-6">
+            <!-- Header -->
+            <div class="text-center mb-4">
+                <i class="fas fa-exclamation-triangle fa-4x text-danger mb-3"></i>
+                <h2 class="text-danger">{% trans "Delete SCORM Package" %}</h2>
+                <p class="text-muted">{% trans "This action cannot be undone" %}</p>
+            </div>
+
+            <!-- Confirmation Card -->
+            <div class="card border-danger">
+                <div class="card-header bg-danger text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-trash"></i> {% trans "Confirm Deletion" %}
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <p class="mb-4">
+                        {% trans "Are you sure you want to delete this SCORM package?" %}
+                    </p>
+                    
+                    <!-- Package Info -->
+                    <div class="bg-light p-3 rounded mb-4">
+                        <h6 class="fw-bold">{{ object.title }}</h6>
+                        {% if object.description %}
+                            <p class="text-muted mb-2">{{ object.description }}</p>
+                        {% endif %}
+                        <div class="small">
+                            <div><strong>{% trans "Course" %}:</strong> {{ object.course.title }}</div>
+                            <div><strong>{% trans "Version" %}:</strong> {{ object.get_version_display }}</div>
+                            <div><strong>{% trans "Uploaded" %}:</strong> {{ object.created_at|date:"M d, Y" }}</div>
+                            {% if object.attempts.count > 0 %}
+                                <div class="text-warning">
+                                    <i class="fas fa-exclamation-triangle"></i>
+                                    <strong>{% trans "Warning" %}:</strong> 
+                                    {% blocktrans count counter=object.attempts.count %}
+                                        This package has {{ counter }} student attempt that will also be deleted.
+                                    {% plural %}
+                                        This package has {{ counter }} student attempts that will also be deleted.
+                                    {% endblocktrans %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <!-- Consequences -->
+                    <div class="alert alert-warning">
+                        <h6><i class="fas fa-info-circle"></i> {% trans "What will be deleted:" %}</h6>
+                        <ul class="mb-0">
+                            <li>{% trans "The SCORM package file and extracted content" %}</li>
+                            <li>{% trans "All student attempts and progress data" %}</li>
+                            <li>{% trans "All interaction and objective tracking data" %}</li>
+                            <li>{% trans "Package settings and configuration" %}</li>
+                        </ul>
+                    </div>
+
+                    <!-- Confirmation Form -->
+                    <form method="post" class="d-flex justify-content-between">
+                        {% csrf_token %}
+                        
+                        <a href="{% url 'scorm:package_detail' slug=object.slug %}" class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left"></i> {% trans "Cancel" %}
+                        </a>
+                        
+                        <button type="submit" class="btn btn-danger">
+                            <i class="fas fa-trash"></i> {% trans "Yes, Delete Package" %}
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Additional Info -->
+            <div class="text-center mt-4">
+                <small class="text-muted">
+                    {% trans "If you're unsure, you can disable the package instead of deleting it by editing its settings." %}
+                </small>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

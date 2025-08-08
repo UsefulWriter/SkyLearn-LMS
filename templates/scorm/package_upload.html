@@ -1,0 +1,349 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load i18n %}
+
+{% block title %}{% trans "Upload SCORM Package" %}{% endblock %}
+
+{% block extra_css %}
+<style>
+.upload-area {
+    border: 2px dashed #dee2e6;
+    border-radius: 8px;
+    padding: 2rem;
+    text-align: center;
+    background: #f8f9fa;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.upload-area:hover {
+    border-color: #007bff;
+    background: #e7f3ff;
+}
+
+.upload-area.dragover {
+    border-color: #007bff;
+    background: #e7f3ff;
+    transform: scale(1.02);
+}
+
+.file-input {
+    display: none;
+}
+
+.file-info {
+    margin-top: 1rem;
+    padding: 0.75rem;
+    background: #e9ecef;
+    border-radius: 4px;
+    display: none;
+}
+
+.progress-bar-container {
+    margin-top: 1rem;
+    display: none;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <!-- Header -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h2><i class="fas fa-upload text-primary"></i> {% trans "Upload SCORM Package" %}</h2>
+                    <p class="text-muted">{% trans "Upload a SCORM 1.2 or 2004 package to make it available to students" %}</p>
+                </div>
+                <a href="{% url 'scorm:package_list' %}" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left"></i> {% trans "Back to Packages" %}
+                </a>
+            </div>
+
+            <!-- Upload Form -->
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">{% trans "Package Information" %}</h5>
+                </div>
+                <div class="card-body">
+                    <form method="post" enctype="multipart/form-data" id="uploadForm">
+                        {% csrf_token %}
+                        
+                        <!-- Basic Information -->
+                        <div class="row mb-3">
+                            <div class="col-md-8">
+                                <label for="{{ form.title.id_for_label }}" class="form-label">
+                                    {{ form.title.label }} <span class="text-danger">*</span>
+                                </label>
+                                {{ form.title }}
+                                {% if form.title.errors %}
+                                    <div class="text-danger small">{{ form.title.errors }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-4">
+                                <label for="{{ form.version.id_for_label }}" class="form-label">
+                                    {{ form.version.label }} <span class="text-danger">*</span>
+                                </label>
+                                {{ form.version }}
+                                {% if form.version.errors %}
+                                    <div class="text-danger small">{{ form.version.errors }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="{{ form.course.id_for_label }}" class="form-label">
+                                {{ form.course.label }} <span class="text-danger">*</span>
+                            </label>
+                            {{ form.course }}
+                            {% if form.course.errors %}
+                                <div class="text-danger small">{{ form.course.errors }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="{{ form.description.id_for_label }}" class="form-label">
+                                {{ form.description.label }}
+                            </label>
+                            {{ form.description }}
+                            {% if form.description.errors %}
+                                <div class="text-danger small">{{ form.description.errors }}</div>
+                            {% endif %}
+                        </div>
+
+                        <!-- File Upload Area -->
+                        <div class="mb-4">
+                            <label class="form-label">
+                                {{ form.package_file.label }} <span class="text-danger">*</span>
+                            </label>
+                            
+                            <div class="upload-area" id="uploadArea">
+                                <i class="fas fa-cloud-upload-alt fa-3x text-muted mb-3"></i>
+                                <h5>{% trans "Drag and drop your SCORM package here" %}</h5>
+                                <p class="text-muted mb-3">{% trans "or click to browse files" %}</p>
+                                <button type="button" class="btn btn-outline-primary" onclick="document.getElementById('id_package_file').click()">
+                                    <i class="fas fa-folder-open"></i> {% trans "Choose File" %}
+                                </button>
+                                <div class="mt-2 small text-muted">
+                                    {% trans "Accepted formats: ZIP files up to 500MB" %}
+                                </div>
+                            </div>
+                            
+                            {{ form.package_file }}
+                            
+                            <div class="file-info" id="fileInfo">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <strong id="fileName"></strong>
+                                        <div class="small text-muted" id="fileSize"></div>
+                                    </div>
+                                    <button type="button" class="btn btn-sm btn-outline-danger" onclick="clearFile()">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <div class="progress-bar-container" id="progressContainer">
+                                <div class="progress">
+                                    <div class="progress-bar" id="uploadProgress" role="progressbar" style="width: 0%">
+                                        <span id="progressText">0%</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            {% if form.package_file.errors %}
+                                <div class="text-danger small mt-2">{{ form.package_file.errors }}</div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Settings -->
+                        <h6 class="mb-3">{% trans "Package Settings" %}</h6>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-4">
+                                <label for="{{ form.passing_score.id_for_label }}" class="form-label">
+                                    {{ form.passing_score.label }}
+                                </label>
+                                {{ form.passing_score }}
+                                {% if form.passing_score.errors %}
+                                    <div class="text-danger small">{{ form.passing_score.errors }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-4">
+                                <label for="{{ form.weight_in_course.id_for_label }}" class="form-label">
+                                    {{ form.weight_in_course.label }}
+                                </label>
+                                {{ form.weight_in_course }}
+                                {% if form.weight_in_course.errors %}
+                                    <div class="text-danger small">{{ form.weight_in_course.errors }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-check mt-4">
+                                    {{ form.allow_multiple_attempts }}
+                                    <label for="{{ form.allow_multiple_attempts.id_for_label }}" class="form-check-label">
+                                        {{ form.allow_multiple_attempts.label }}
+                                    </label>
+                                    {% if form.allow_multiple_attempts.errors %}
+                                        <div class="text-danger small">{{ form.allow_multiple_attempts.errors }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Submit Button -->
+                        <div class="text-end">
+                            <button type="submit" class="btn btn-primary" id="submitBtn">
+                                <i class="fas fa-upload"></i> {% trans "Upload Package" %}
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Help Information -->
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h6 class="mb-0">
+                        <i class="fas fa-info-circle text-info"></i> 
+                        {% trans "SCORM Package Requirements" %}
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6>{% trans "Supported Versions" %}</h6>
+                            <ul class="list-unstyled">
+                                <li><i class="fas fa-check text-success"></i> SCORM 1.2</li>
+                                <li><i class="fas fa-check text-success"></i> SCORM 2004 3rd Edition</li>
+                                <li><i class="fas fa-check text-success"></i> SCORM 2004 4th Edition</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <h6>{% trans "File Requirements" %}</h6>
+                            <ul class="list-unstyled">
+                                <li><i class="fas fa-check text-success"></i> {% trans "ZIP format only" %}</li>
+                                <li><i class="fas fa-check text-success"></i> {% trans "Maximum 500MB file size" %}</li>
+                                <li><i class="fas fa-check text-success"></i> {% trans "Must contain imsmanifest.xml" %}</li>
+                                <li><i class="fas fa-check text-success"></i> {% trans "Valid SCORM structure" %}</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const uploadArea = document.getElementById('uploadArea');
+    const fileInput = document.getElementById('id_package_file');
+    const fileInfo = document.getElementById('fileInfo');
+    const fileName = document.getElementById('fileName');
+    const fileSize = document.getElementById('fileSize');
+    const progressContainer = document.getElementById('progressContainer');
+    const submitBtn = document.getElementById('submitBtn');
+    
+    // Drag and drop functionality
+    uploadArea.addEventListener('dragover', function(e) {
+        e.preventDefault();
+        uploadArea.classList.add('dragover');
+    });
+    
+    uploadArea.addEventListener('dragleave', function(e) {
+        e.preventDefault();
+        uploadArea.classList.remove('dragover');
+    });
+    
+    uploadArea.addEventListener('drop', function(e) {
+        e.preventDefault();
+        uploadArea.classList.remove('dragover');
+        
+        const files = e.dataTransfer.files;
+        if (files.length > 0) {
+            handleFileSelection(files[0]);
+        }
+    });
+    
+    uploadArea.addEventListener('click', function() {
+        fileInput.click();
+    });
+    
+    fileInput.addEventListener('change', function() {
+        if (this.files.length > 0) {
+            handleFileSelection(this.files[0]);
+        }
+    });
+    
+    function handleFileSelection(file) {
+        // Validate file
+        if (!file.name.toLowerCase().endsWith('.zip')) {
+            alert('{% trans "Please select a ZIP file." %}');
+            return;
+        }
+        
+        if (file.size > 500 * 1024 * 1024) { // 500MB
+            alert('{% trans "File size cannot exceed 500MB." %}');
+            return;
+        }
+        
+        // Show file info
+        fileName.textContent = file.name;
+        fileSize.textContent = formatFileSize(file.size);
+        fileInfo.style.display = 'block';
+        uploadArea.style.display = 'none';
+    }
+    
+    function clearFile() {
+        fileInput.value = '';
+        fileInfo.style.display = 'none';
+        uploadArea.style.display = 'block';
+        progressContainer.style.display = 'none';
+    }
+    
+    function formatFileSize(bytes) {
+        if (bytes === 0) return '0 Bytes';
+        const k = 1024;
+        const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    }
+    
+    // Form submission with progress (basic implementation)
+    document.getElementById('uploadForm').addEventListener('submit', function() {
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> {% trans "Uploading..." %}';
+        
+        // Show progress bar
+        if (fileInput.files.length > 0) {
+            progressContainer.style.display = 'block';
+            
+            // Simulate progress (replace with actual upload progress in production)
+            let progress = 0;
+            const interval = setInterval(function() {
+                progress += 2;
+                if (progress >= 90) {
+                    clearInterval(interval);
+                }
+                updateProgress(progress);
+            }, 100);
+        }
+    });
+    
+    function updateProgress(percent) {
+        const progressBar = document.getElementById('uploadProgress');
+        const progressText = document.getElementById('progressText');
+        
+        progressBar.style.width = percent + '%';
+        progressText.textContent = percent + '%';
+    }
+    
+    // Make functions available globally
+    window.clearFile = clearFile;
+});
+</script>
+{% endblock %}

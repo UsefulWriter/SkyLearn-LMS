@@ -1,0 +1,552 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load i18n %}
+
+{% block title %}{{ package.title }} - {{ package.course.title }}{% endblock %}
+
+{% block extra_css %}
+<style>
+/* Full screen layout adjustments */
+body {
+    overflow-x: hidden;
+}
+
+.container-fluid.main-content {
+    max-width: 100% !important;
+    padding: 0 !important;
+}
+
+.scorm-module-container {
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    overflow: hidden;
+    margin: 0;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.scorm-module-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 15px 20px;
+    flex-shrink: 0;
+}
+
+.scorm-module-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.scorm-module-title {
+    font-size: 20px;
+    font-weight: 600;
+    margin: 0;
+}
+
+.scorm-module-meta {
+    display: flex;
+    gap: 20px;
+    font-size: 14px;
+    opacity: 0.9;
+}
+
+.scorm-progress-bar {
+    background: rgba(255,255,255,0.2);
+    border-radius: 4px;
+    height: 6px;
+    overflow: hidden;
+    margin-top: 10px;
+}
+
+.scorm-progress-fill {
+    background: #4ade80;
+    height: 100%;
+    width: 0%;
+    transition: width 0.3s ease;
+}
+
+.scorm-main-content {
+    flex: 1;
+    display: flex;
+    background: #2a3f5f;
+    min-height: 0;
+}
+
+.scorm-content-wrapper {
+    position: relative;
+    background: #2a3f5f;
+    flex: 1;
+    display: flex;
+    align-items: stretch;
+    justify-content: center;
+    padding: 0;
+    width: 90%;
+}
+
+.scorm-iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+    display: block;
+    background: #2a3f5f;
+}
+
+.scorm-sidebar {
+    background: white;
+    padding: 15px;
+    border-left: 1px solid #e5e7eb;
+    width: 10%;
+    min-width: 200px;
+    overflow-y: auto;
+    flex-shrink: 0;
+}
+
+.scorm-sidebar h6 {
+    color: #6b7280;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 10px;
+}
+
+.scorm-status-card {
+    background: #f3f4f6;
+    border-radius: 6px;
+    padding: 12px;
+    margin-bottom: 12px;
+}
+
+.scorm-status-label {
+    color: #6b7280;
+    font-size: 12px;
+    margin-bottom: 4px;
+}
+
+.scorm-status-value {
+    font-size: 16px;
+    font-weight: 600;
+    color: #111827;
+}
+
+.scorm-action-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 15px;
+}
+
+.scorm-action-buttons .btn {
+    font-size: 12px;
+    padding: 6px 12px;
+}
+
+.status-indicator {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    margin-right: 5px;
+}
+
+.status-indicator.incomplete { background: #fbbf24; }
+.status-indicator.completed { background: #4ade80; }
+.status-indicator.passed { background: #10b981; }
+.status-indicator.failed { background: #ef4444; }
+
+.loading-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(42, 63, 95, 0.95);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10;
+    color: white;
+}
+
+.loading-content {
+    text-align: center;
+}
+
+.loading-spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid rgba(255,255,255,0.3);
+    border-top-color: #667eea;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Responsive adjustments */
+@media (max-width: 991px) {
+    .scorm-main-content {
+        flex-direction: column;
+    }
+    
+    .scorm-content-wrapper {
+        width: 100%;
+        height: 70vh;
+    }
+    
+    .scorm-sidebar {
+        width: 100%;
+        height: 30vh;
+        border-left: none;
+        border-top: 1px solid #e5e7eb;
+    }
+}
+
+@media (max-width: 767px) {
+    .scorm-module-container {
+        border-radius: 0;
+    }
+    
+    .scorm-content-wrapper {
+        height: 60vh;
+    }
+    
+    .scorm-sidebar {
+        height: 40vh;
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid main-content">
+
+<!-- Breadcrumb Navigation -->
+<nav style="--bs-breadcrumb-divider: '>';position: absolute; top: 10px; left: 20px; z-index: 1000;" aria-label="breadcrumb">
+    <ol class="breadcrumb bg-transparent">
+        <li class="breadcrumb-item"><a href="/" class="text-white">{% trans 'Home' %}</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'programs' %}" class="text-white">{% trans 'Programs' %}</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'program_detail' package.course.program.id %}" class="text-white">{{ package.course.program }}</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'course_detail' package.course.slug %}" class="text-white">{{ package.course }}</a></li>
+        <li class="breadcrumb-item active text-white-50" aria-current="page">{{ package.title }}</li>
+    </ol>
+</nav>
+
+<!-- SCORM Module Container -->
+<div class="scorm-module-container">
+    <!-- Module Header -->
+    <div class="scorm-module-header">
+        <div class="scorm-module-info">
+            <div>
+                <h1 class="scorm-module-title">{{ package.title }}</h1>
+                <p class="mb-0 mt-1 small">{{ package.description|default:"Interactive SCORM Learning Module" }}</p>
+            </div>
+            <div class="scorm-module-meta">
+                <span><i class="fas fa-book-open me-1"></i> {{ package.course.title }}</span>
+                <span><i class="fas fa-clock me-1"></i> <span id="timeSpent">00:00</span></span>
+            </div>
+        </div>
+        
+        <!-- Progress Bar -->
+        <div class="scorm-progress-bar">
+            <div class="scorm-progress-fill" id="progressBar"></div>
+        </div>
+    </div>
+
+    <!-- Main Content Area -->
+    <div class="scorm-main-content">
+        <div class="scorm-content-wrapper">
+            <!-- Loading Overlay -->
+            <div class="loading-overlay" id="loadingOverlay">
+                <div class="loading-content">
+                    <div class="loading-spinner"></div>
+                    <p class="mt-3">{% trans "Loading SCORM content..." %}</p>
+                </div>
+            </div>
+            
+            <!-- SCORM Content Frame -->
+            <iframe 
+                id="scormFrame" 
+                class="scorm-iframe"
+                src="{{ launch_url }}"
+                onload="onScormLoad()"
+                allow="autoplay; fullscreen">
+            </iframe>
+        </div>
+        
+        <!-- Sidebar (10% width) -->
+        <div class="scorm-sidebar">
+            <h6>{% trans "Progress" %}</h6>
+            
+            <!-- Status Card -->
+            <div class="scorm-status-card">
+                <div class="scorm-status-label">{% trans "Status" %}</div>
+                <div class="scorm-status-value">
+                    <span class="status-indicator incomplete" id="statusIndicator"></span>
+                    <span id="statusText">{% trans "In Progress" %}</span>
+                </div>
+            </div>
+            
+            <!-- Score Card -->
+            <div class="scorm-status-card" id="scoreCard" style="display:none;">
+                <div class="scorm-status-label">{% trans "Score" %}</div>
+                <div class="scorm-status-value">
+                    <span id="scoreValue">-</span>%
+                </div>
+            </div>
+            
+            <!-- Attempts Card -->
+            {% if package.allow_multiple_attempts %}
+            <div class="scorm-status-card">
+                <div class="scorm-status-label">{% trans "Attempts" %}</div>
+                <div class="scorm-status-value">
+                    {{ attempt_count }} / {% if package.max_attempts %}{{ package.max_attempts }}{% else %}∞{% endif %}
+                </div>
+            </div>
+            {% endif %}
+            
+            <!-- Passing Score -->
+            <div class="scorm-status-card">
+                <div class="scorm-status-label">{% trans "Passing Score" %}</div>
+                <div class="scorm-status-value">{{ package.passing_score }}%</div>
+            </div>
+            
+            <!-- Action Buttons -->
+            <div class="scorm-action-buttons">
+                <button class="btn btn-outline-primary btn-sm" onclick="saveProgress()">
+                    <i class="fas fa-save"></i> {% trans "Save" %}
+                </button>
+                <button class="btn btn-outline-danger btn-sm" onclick="exitModule()">
+                    <i class="fas fa-sign-out-alt"></i> {% trans "Exit" %}
+                </button>
+            </div>
+            
+            <!-- Module Information -->
+            {% if other_packages %}
+            <hr class="my-3">
+            <h6>{% trans "Other Modules" %}</h6>
+            <div class="list-group list-group-flush">
+                {% for other in other_packages %}
+                <a href="{% url 'scorm:launch' slug=other.slug %}" class="list-group-item list-group-item-action p-2 small">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span>{{ other.title|truncatechars:20 }}</span>
+                        {% if other.id in completed_packages %}
+                        <i class="fas fa-check-circle text-success"></i>
+                        {% endif %}
+                    </div>
+                </a>
+                {% endfor %}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+</div>
+
+<!-- SCORM API Bridge JavaScript -->
+<script>
+// SCORM API implementation and page functionality
+let scormAPI = null;
+let currentAttempt = {{ attempt.id }};
+let startTime = Date.now();
+let timeInterval = null;
+
+// Initialize SCORM API bridge
+function initializeSCORM() {
+    // Create SCORM 1.2 API bridge
+    window.API = {
+        LMSInitialize: function(param) {
+            console.log('SCORM: LMSInitialize called');
+            return "true";
+        },
+        
+        LMSGetValue: function(element) {
+            console.log('SCORM: LMSGetValue called for:', element);
+            
+            // Handle different SCORM data elements
+            switch(element) {
+                case 'cmi.core.lesson_status':
+                    return '{{ attempt.lesson_status }}';
+                case 'cmi.core.score.raw':
+                    return '{{ attempt.score_raw|default:"" }}';
+                case 'cmi.core.score.max':
+                    return '{{ attempt.score_max|default:"100" }}';
+                case 'cmi.core.score.min':
+                    return '{{ attempt.score_min|default:"0" }}';
+                case 'cmi.core.session_time':
+                    return '{{ attempt.session_time|default:"00:00:00" }}';
+                case 'cmi.core.total_time':
+                    return '{{ attempt.total_time|default:"00:00:00" }}';
+                case 'cmi.suspend_data':
+                    return '{{ attempt.suspend_data|default:"" }}';
+                case 'cmi.core.lesson_location':
+                    return '{{ attempt.lesson_location|default:"" }}';
+                case 'cmi.core.entry':
+                    return '{{ attempt.entry|default:"ab-initio" }}';
+                default:
+                    return "";
+            }
+        },
+        
+        LMSSetValue: function(element, value) {
+            console.log('SCORM: LMSSetValue called:', element, '=', value);
+            
+            // Send data to server
+            fetch('{{ scorm_api_url }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+                body: JSON.stringify({
+                    attempt_id: currentAttempt,
+                    element: element,
+                    value: value
+                })
+            }).then(response => response.json())
+              .then(data => {
+                  if (data.success) {
+                      updateUI(element, value);
+                  }
+              });
+            
+            return "true";
+        },
+        
+        LMSCommit: function(param) {
+            console.log('SCORM: LMSCommit called');
+            return "true";
+        },
+        
+        LMSFinish: function(param) {
+            console.log('SCORM: LMSFinish called');
+            return "true";
+        },
+        
+        LMSGetLastError: function() {
+            return "0";
+        },
+        
+        LMSGetErrorString: function(errorCode) {
+            return "";
+        },
+        
+        LMSGetDiagnostic: function(errorCode) {
+            return "";
+        }
+    };
+    
+    // Also provide SCORM 2004 API
+    window.API_1484_11 = window.API;
+}
+
+// Update UI based on SCORM data
+function updateUI(element, value) {
+    switch(element) {
+        case 'cmi.core.lesson_status':
+            updateStatus(value);
+            break;
+        case 'cmi.core.score.raw':
+            updateScore(value);
+            break;
+    }
+}
+
+// Update status display
+function updateStatus(status) {
+    const statusIndicator = document.getElementById('statusIndicator');
+    const statusText = document.getElementById('statusText');
+    
+    statusIndicator.className = 'status-indicator ' + status;
+    
+    switch(status) {
+        case 'completed':
+            statusText.textContent = '{% trans "Completed" %}';
+            break;
+        case 'passed':
+            statusText.textContent = '{% trans "Passed" %}';
+            break;
+        case 'failed':
+            statusText.textContent = '{% trans "Failed" %}';
+            break;
+        default:
+            statusText.textContent = '{% trans "In Progress" %}';
+    }
+}
+
+// Update score display
+function updateScore(score) {
+    document.getElementById('scoreValue').textContent = score;
+    document.getElementById('scoreCard').style.display = 'block';
+    
+    // Update progress bar
+    const progressBar = document.getElementById('progressBar');
+    progressBar.style.width = score + '%';
+}
+
+// Time tracking
+function updateTimeSpent() {
+    const elapsed = Math.floor((Date.now() - startTime) / 1000);
+    const minutes = Math.floor(elapsed / 60);
+    const seconds = elapsed % 60;
+    
+    document.getElementById('timeSpent').textContent = 
+        String(minutes).padStart(2, '0') + ':' + String(seconds).padStart(2, '0');
+}
+
+// Save progress manually
+function saveProgress() {
+    if (window.API && typeof window.API.LMSCommit === 'function') {
+        window.API.LMSCommit('');
+        alert('{% trans "Progress saved successfully!" %}');
+    }
+}
+
+// Exit module
+function exitModule() {
+    if (confirm('{% trans "Are you sure you want to exit this module?" %}')) {
+        window.location.href = '{% url "course_detail" package.course.slug %}';
+    }
+}
+
+// Handle iframe load
+function onScormLoad() {
+    document.getElementById('loadingOverlay').style.display = 'none';
+    
+    // Try to inject API into iframe
+    try {
+        const iframe = document.getElementById('scormFrame');
+        if (iframe.contentWindow) {
+            iframe.contentWindow.API = window.API;
+            iframe.contentWindow.API_1484_11 = window.API_1484_11;
+        }
+    } catch (e) {
+        console.log('Could not inject API into iframe due to cross-origin restrictions');
+    }
+}
+
+// Initialize everything when page loads
+document.addEventListener('DOMContentLoaded', function() {
+    initializeSCORM();
+    
+    // Start time tracking
+    timeInterval = setInterval(updateTimeSpent, 1000);
+    
+    // Handle page unload
+    window.addEventListener('beforeunload', function() {
+        if (timeInterval) {
+            clearInterval(timeInterval);
+        }
+        if (window.API) {
+            window.API.LMSFinish('');
+        }
+    });
+});
+</script>
+{% endblock %}

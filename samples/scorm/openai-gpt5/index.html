@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Open AI GPT-5 Fundamentals</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="style.css">
+  <script defer src="scorm_api_wrapper.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      // Initialize SCORM session
+      if (window.APIWrapper && APIWrapper.doInitialize()) {
+        // Mark lesson as incomplete at start if not already set
+        var status = APIWrapper.doGetValue('cmi.core.lesson_status') || '';
+        if (!status || status === 'not attempted') {
+          APIWrapper.doSetValue('cmi.core.lesson_status', 'incomplete');
+          APIWrapper.doCommit();
+        }
+        // Optional bookmark example
+        APIWrapper.doSetValue('cmi.core.lesson_location', 'intro');
+      }
+
+      // Bind buttons
+      document.getElementById('btn-complete').addEventListener('click', function () {
+        if (!window.APIWrapper) return;
+        APIWrapper.doSetValue('cmi.core.score.raw', '95');
+        APIWrapper.doSetValue('cmi.core.lesson_status', 'completed');
+        APIWrapper.doCommit();
+        alert('Marked as completed with score 95.');
+      });
+
+      document.getElementById('btn-exit').addEventListener('click', function () {
+        if (!window.APIWrapper) return;
+        APIWrapper.doCommit();
+        APIWrapper.doFinish();
+        alert('Session ended. You can close this window/tab.');
+      });
+    });
+  </script>
+</head>
+<body>
+  <header class="header">
+    <h1>Open AI GPT-5 Fundamentals</h1>
+    <p class="sub">A quick primer on GPT-5 capabilities, safety, and applications</p>
+  </header>
+
+  <main class="container">
+    <section class="card">
+      <h2>Welcome</h2>
+      <p>In this short course, you’ll explore GPT-5 at a high level: what it is, where it shines, and how to apply it responsibly.</p>
+    </section>
+
+    <section class="card">
+      <h2>What is GPT-5?</h2>
+      <ul>
+        <li>Large multimodal model designed for advanced reasoning and assistance.</li>
+        <li>Trained on diverse data to generalize across tasks.</li>
+        <li>Accessible via API for integration into products and workflows.</li>
+      </ul>
+    </section>
+
+    <section class="card">
+      <h2>Key Capabilities</h2>
+      <ul>
+        <li>Natural language understanding and generation</li>
+        <li>Tool use and function calling for structured tasks</li>
+        <li>Longer-context reasoning and planning</li>
+        <li>Multimodal understanding (text + other modalities)</li>
+      </ul>
+    </section>
+
+    <section class="card">
+      <h2>Safety and Alignment</h2>
+      <ul>
+        <li>Guardrails to reduce harmful or high-risk outputs</li>
+        <li>Content controls and policy enforcement</li>
+        <li>Continuous monitoring and red-teaming</li>
+      </ul>
+    </section>
+
+    <section class="card">
+      <h2>Use Cases</h2>
+      <ul>
+        <li>Assistants and copilot experiences</li>
+        <li>Knowledge retrieval and summarization</li>
+        <li>Content drafting and editing</li>
+        <li>Automation of routine tasks</li>
+      </ul>
+    </section>
+
+    <section class="card">
+      <h2>Limitations</h2>
+      <ul>
+        <li>May produce incorrect or outdated information</li>
+        <li>Needs careful prompt and system design for reliability</li>
+        <li>Policy and compliance considerations for sensitive domains</li>
+      </ul>
+    </section>
+
+    <section class="actions">
+      <button id="btn-complete" class="btn primary">Mark Complete (Score 95)</button>
+      <button id="btn-exit" class="btn">Exit</button>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <small>SCORM 1.2 Sample • Open AI GPT-5 Fundamentals</small>
+  </footer>
+</body>
+</html>

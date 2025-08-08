@@ -122,6 +122,10 @@ def course_single(request, slug):
     files = Upload.objects.filter(course__slug=slug)
     videos = UploadVideo.objects.filter(course__slug=slug)
     lecturers = CourseAllocation.objects.filter(courses__pk=course.id)
+    
+    # Get SCORM packages for this course
+    scorm_packages = course.scorm_packages.filter(status='ready').order_by('-created_at')
+    
     return render(
         request,
         "course/course_single.html",
@@ -131,6 +135,7 @@ def course_single(request, slug):
             "files": files,
             "videos": videos,
             "lecturers": lecturers,
+            "scorm_packages": scorm_packages,
             "media_url": settings.MEDIA_URL,
         },
     )

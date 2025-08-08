@@ -1,0 +1,151 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load i18n %}
+
+{% block title %}{% trans "Edit SCORM Package" %} - {{ object.title }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <!-- Header -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h2><i class="fas fa-edit text-primary"></i> {% trans "Edit SCORM Package" %}</h2>
+                    <p class="text-muted">{% trans "Update package settings and configuration" %}</p>
+                </div>
+                <a href="{% url 'scorm:package_detail' slug=object.slug %}" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left"></i> {% trans "Back to Package" %}
+                </a>
+            </div>
+
+            <!-- Edit Form -->
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">{% trans "Package Settings" %}</h5>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <!-- Basic Information -->
+                        <div class="mb-3">
+                            <label for="{{ form.title.id_for_label }}" class="form-label">
+                                {{ form.title.label }} <span class="text-danger">*</span>
+                            </label>
+                            {{ form.title }}
+                            {% if form.title.errors %}
+                                <div class="text-danger small">{{ form.title.errors }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="{{ form.description.id_for_label }}" class="form-label">
+                                {{ form.description.label }}
+                            </label>
+                            {{ form.description }}
+                            {% if form.description.errors %}
+                                <div class="text-danger small">{{ form.description.errors }}</div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Settings -->
+                        <h6 class="mb-3">{% trans "Package Settings" %}</h6>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="{{ form.passing_score.id_for_label }}" class="form-label">
+                                    {{ form.passing_score.label }}
+                                </label>
+                                {{ form.passing_score }}
+                                {% if form.passing_score.errors %}
+                                    <div class="text-danger small">{{ form.passing_score.errors }}</div>
+                                {% endif %}
+                                <div class="small text-muted">{% trans "Minimum score required to pass (0-100%)" %}</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="{{ form.weight_in_course.id_for_label }}" class="form-label">
+                                    {{ form.weight_in_course.label }}
+                                </label>
+                                {{ form.weight_in_course }}
+                                {% if form.weight_in_course.errors %}
+                                    <div class="text-danger small">{{ form.weight_in_course.errors }}</div>
+                                {% endif %}
+                                <div class="small text-muted">{% trans "How much this package contributes to the overall course grade" %}</div>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <div class="form-check">
+                                {{ form.allow_multiple_attempts }}
+                                <label for="{{ form.allow_multiple_attempts.id_for_label }}" class="form-check-label">
+                                    {{ form.allow_multiple_attempts.label }}
+                                </label>
+                                {% if form.allow_multiple_attempts.errors %}
+                                    <div class="text-danger small">{{ form.allow_multiple_attempts.errors }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- Submit Button -->
+                        <div class="text-end">
+                            <a href="{% url 'scorm:package_detail' slug=object.slug %}" class="btn btn-secondary me-2">
+                                <i class="fas fa-times"></i> {% trans "Cancel" %}
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> {% trans "Save Changes" %}
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Current Package Info -->
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h6 class="mb-0">
+                        <i class="fas fa-info-circle"></i> 
+                        {% trans "Current Package Information" %}
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <dl class="row mb-0">
+                        <dt class="col-sm-4">{% trans "File Name" %}</dt>
+                        <dd class="col-sm-8">{{ object.package_file.name|default:"-" }}</dd>
+                        
+                        <dt class="col-sm-4">{% trans "File Size" %}</dt>
+                        <dd class="col-sm-8">{{ object.package_file.size|filesizeformat|default:"-" }}</dd>
+                        
+                        <dt class="col-sm-4">{% trans "SCORM Version" %}</dt>
+                        <dd class="col-sm-8">{{ object.get_version_display }}</dd>
+                        
+                        <dt class="col-sm-4">{% trans "Course" %}</dt>
+                        <dd class="col-sm-8">
+                            <a href="{{ object.course.get_absolute_url }}">{{ object.course.title }}</a>
+                        </dd>
+                        
+                        <dt class="col-sm-4">{% trans "Status" %}</dt>
+                        <dd class="col-sm-8">
+                            {% if object.status == 'ready' %}
+                                <span class="badge bg-success">{% trans "Ready" %}</span>
+                            {% elif object.status == 'processing' %}
+                                <span class="badge bg-warning">{% trans "Processing" %}</span>
+                            {% elif object.status == 'error' %}
+                                <span class="badge bg-danger">{% trans "Error" %}</span>
+                            {% else %}
+                                <span class="badge bg-secondary">{% trans "Pending" %}</span>
+                            {% endif %}
+                        </dd>
+                        
+                        <dt class="col-sm-4">{% trans "Uploaded" %}</dt>
+                        <dd class="col-sm-8">
+                            {{ object.created_at|date:"M d, Y H:i" }} 
+                            {% trans "by" %} {{ object.uploaded_by.get_full_name|default:object.uploaded_by.username }}
+                        </dd>
+                    </dl>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

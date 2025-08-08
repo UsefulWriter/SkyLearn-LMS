@@ -3,6 +3,94 @@
 {% block title %}{{ title }} | {% trans 'Learning management system' %}{% endblock title %}
 {% load static %}
 
+{% block extra_css %}
+<style>
+/* Modern Course Module Styles */
+.module-card {
+    transition: transform 0.2s, box-shadow 0.2s;
+    border: 1px solid #e5e7eb;
+}
+
+.module-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+}
+
+.module-icon {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+}
+
+.module-progress {
+    height: 4px;
+    background: #e5e7eb;
+    border-radius: 2px;
+    overflow: hidden;
+    margin-top: 10px;
+}
+
+.module-progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+    transition: width 0.3s ease;
+}
+
+.badge-module {
+    font-size: 11px;
+    padding: 3px 8px;
+    font-weight: 500;
+}
+
+.content-section {
+    background: white;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 25px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #f3f4f6;
+}
+
+.section-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: #111827;
+    margin: 0;
+}
+
+.module-stats {
+    display: flex;
+    gap: 15px;
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid #f3f4f6;
+}
+
+.stat-item {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 13px;
+    color: #6b7280;
+}
+
+.stat-item i {
+    color: #9ca3af;
+}
+</style>
+{% endblock %}
+
 {% block content %}
 
 <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
@@ -32,6 +120,11 @@
             </a>
             <a class="btn btn-sm btn-primary" href="{% url 'upload_video' course.slug %}"><i class="fas fa-plus"></i>
                 {% trans 'Upload new video' %}
+            </a>
+            {% endif %}
+            {% if request.user.is_superuser %}
+            <a class="btn btn-sm btn-success" href="{% url 'scorm:package_create' %}"><i class="fas fa-plus"></i>
+                {% trans 'Upload SCORM Package' %}
             </a>
             {% endif %}
         </div>
@@ -123,6 +216,98 @@
                     </tbody>
                 </table>
             </div>
+        </div>
+    </div>
+
+    <!-- Interactive Learning Modules (SCORM) Section -->
+    <div class="content-section">
+        <div class="section-header">
+            <h3 class="section-title">
+                <i class="fas fa-graduation-cap text-primary me-2"></i>
+                {% trans 'Interactive Learning Modules' %}
+            </h3>
+            {% if request.user.is_superuser %}
+            <a href="{% url 'scorm:package_create' %}" class="btn btn-sm btn-success">
+                <i class="fas fa-plus"></i> {% trans 'Add Module' %}
+            </a>
+            {% endif %}
+        </div>
+            
+            {% if scorm_packages %}
+            <div class="row mt-3">
+                {% for package in scorm_packages %}
+                <div class="col-md-6 col-lg-4 mb-3">
+                    <div class="card module-card h-100">
+                        <div class="card-body">
+                            <div class="d-flex align-items-start mb-2">
+                                <div class="module-icon bg-primary bg-opacity-10 me-3">
+                                    <i class="fas fa-graduation-cap text-primary"></i>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <h6 class="card-title mb-1">
+                                        <a href="{% url 'scorm:launch' slug=package.slug %}" class="text-decoration-none text-dark">
+                                            {{ package.title }}
+                                        </a>
+                                    </h6>
+                                    <span class="badge badge-module bg-info bg-opacity-10 text-info">{{ package.get_version_display }}</span>
+                                </div>
+                            </div>
+                            
+                            {% if package.description %}
+                            <p class="card-text small text-muted mb-3">
+                                {{ package.description|truncatechars:100 }}
+                            </p>
+                            {% endif %}
+                            
+                            <div class="d-flex justify-content-between align-items-center">
+                                <small class="text-muted">
+                                    <i class="far fa-calendar"></i> {{ package.created_at|date:"M d, Y" }}
+                                </small>
+                                <div class="btn-group" role="group">
+                                    <a href="{% url 'scorm:launch' slug=package.slug %}" 
+                                       class="btn btn-sm btn-primary"
+                                       title="{% trans 'Start Learning' %}">
+                                        <i class="fas fa-play"></i> {% trans 'Start' %}
+                                    </a>
+                                    {% if request.user.is_superuser %}
+                                    <a href="{% url 'scorm:package_update' slug=package.slug %}" 
+                                       class="btn btn-sm btn-outline-secondary"
+                                       title="{% trans 'Edit' %}">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            
+                            <div class="module-stats">
+                                {% if package.weight_in_course > 0 %}
+                                <div class="stat-item">
+                                    <i class="fas fa-percentage"></i>
+                                    <span>{{ package.weight_in_course }}% {% trans 'weight' %}</span>
+                                </div>
+                                {% endif %}
+                                <div class="stat-item">
+                                    <i class="fas fa-trophy"></i>
+                                    <span>{{ package.passing_score }}% {% trans 'to pass' %}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="alert alert-info" role="alert">
+                <i class="fas fa-info-circle me-2"></i>
+                {% trans 'No interactive learning modules available for this course.' %}
+                {% if request.user.is_superuser %}
+                <a href="{% url 'scorm:package_create' %}" class="alert-link">
+                    {% trans 'Upload a SCORM package now.' %}
+                </a>
+                {% endif %}
+            </div>
+            {% endif %}
         </div>
     </div>
 
