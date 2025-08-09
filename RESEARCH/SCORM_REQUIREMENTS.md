@@ -1,4 +1,4 @@
-# SCORM Implementation Requirements for SkyLearn LMS
+# SCORM Implementation Requirements for UsefulWriter LMS
 
 ## Recommended Approach Based on Current Architecture
 

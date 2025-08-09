@@ -4,7 +4,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-SkyLearn is a Django 5.0 LTS-based Learning Management System for educational institutions with multi-language support (English, French, Spanish, Russian) and comprehensive features for course management, assessments, and grading.
+UsefulWriter is a Django 5.0 LTS-based Learning Management System for educational institutions with multi-language support (English, French, Spanish, Russian) and comprehensive features for course management, assessments, and grading.
+
+**IMPORTANT - Future Migration Plan**: This LMS will be restructured for 24/7 self-paced online course delivery. The current academic session/semester model will be replaced with continuous enrollment. However, complete the current academic-based implementation first before attempting this structural migration to preserve existing data and functionality.
 
 ## Essential Commands
 
@@ -146,17 +148,31 @@ EMAIL_BACKEND=django.core.mail.backends.console.EmailBackend  # Dev
 EMAIL_HOST=smtp.gmail.com
 EMAIL_PORT=587
 EMAIL_USE_TLS=True
-EMAIL_FROM_ADDRESS=SkyLearn <email@example.com>
+EMAIL_FROM_ADDRESS=UsefulWriter <email@example.com>
 EMAIL_HOST_USER=<email>
 EMAIL_HOST_PASSWORD=<password>
 ```
 
-## Current TODO Items (from TODO.md)
+## Development Roadmap
+
+### Phase 1: Complete Academic-Based System (Current Priority)
 - School calendar implementation
-- Payment integration completion
+- Payment integration completion (Stripe/GoPay)  
 - Dashboard with live data
 - Data export for all tables
 - PDF report generation with xhtml2pdf
+
+### Phase 2: Prepare for Migration
+- Create comprehensive data backup strategy
+- Design migration plan from academic to self-paced model
+- Test data integrity preservation methods
+
+### Phase 3: Self-Paced Conversion (Future)
+- Remove Session/Semester models and dependencies
+- Convert to continuous enrollment model
+- Update course access to be immediate upon registration
+- Modify progress tracking for individual course completion
+- Restructure GPA/CGPA calculations for rolling completion
 
 ## Production Deployment
 ```bash

@@ -1,4 +1,4 @@
-# SCORM Implementation Strategy for SkyLearn LMS
+# SCORM Implementation Strategy for UsefulWriter LMS
 
 ## Executive Summary
 
@@ -14,7 +14,7 @@ This approach allows for:
 
 ### What We Have (Working Well)
 ```
-SkyLearn/
+UsefulWriter/
 ├── accounts/          # User management
 ├── core/             # Dashboard, news, sessions
 ├── course/           # Course management
@@ -36,7 +36,7 @@ SkyLearn/
 ### Phase 1: SCORM Foundation (Parallel Implementation)
 
 ```
-SkyLearn/
+UsefulWriter/
 ├── [existing apps...]
 ├── scorm/            # NEW: SCORM package management
 │   ├── models.py     # SCORMPackage, SCORMAttempt, SCORMData
@@ -175,8 +175,8 @@ media/
 
 ### Your SCORM-Compliant Courses
 1. **Package as SCORM**: Use tools like `simple-scorm-packager`
-2. **Include SCORM API**: Your React app communicates with SkyLearn
-3. **Upload**: Use SkyLearn's SCORM upload interface
+2. **Include SCORM API**: Your React app communicates with UsefulWriter
+3. **Upload**: Use UsefulWriter's SCORM upload interface
 4. **Deploy**: Automatic extraction and course creation
 
 ### Example React Integration

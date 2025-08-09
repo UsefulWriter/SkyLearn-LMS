@@ -1,4 +1,4 @@
-# SkyLearn LMS - Complete Feature List (Unprioritized)
+# UsefulWriter LMS - Complete Feature List (Unprioritized)
 
 ## Accounts App Features
 - Multi-role user system (Student, Lecturer, Parent, Department Head)

@@ -1,8 +1,8 @@
 #!/bin/bash
 
-# SkyLearn LMS Server Stop Script
+# UsefulWriter LMS Server Stop Script
 
-echo "🛑 Stopping SkyLearn LMS server..."
+echo "🛑 Stopping UsefulWriter LMS server..."
 
 # Find and kill any process using port 8000
 if lsof -Pi :8000 -sTCP:LISTEN -t >/dev/null ; then

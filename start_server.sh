@@ -1,8 +1,8 @@
 #!/bin/bash
 
-# SkyLearn LMS Server Startup Script
+# UsefulWriter LMS Server Startup Script
 
-echo "🚀 Starting SkyLearn LMS..."
+echo "🚀 Starting UsefulWriter LMS..."
 echo ""
 
 # Activate virtual environment

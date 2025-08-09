@@ -1,4 +1,4 @@
-# SkyLearn LMS - Comprehensive Development To-Do List
+# UsefulWriter LMS - Comprehensive Development To-Do List
 
 ## Priority 1: SCORM Implementation (Based on SCORM_IMPLEMENTATION_STRATEGY.md)
 
